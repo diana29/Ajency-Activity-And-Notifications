@@ -101,7 +101,7 @@ function ajan_get_user_personal_activities($user_id=0,$page='',$per_page=''){
  * @since ajency-activity-and-notifications (0.1.0)
  * @uses ajan_has_activities() to get activities.
  * @uses ajan_has_activities filter hook to return the as it is
- * @param $user_id the suer id of the user who is mentioned in activites, 
+ * @param $user_id the user id of the user who is mentioned in activites, 
  * if not passed the logged in users activites are returned
  * @param $page which page /offset to return
  * @param $per_page no of activites per page
@@ -124,6 +124,46 @@ function ajan_get_user_mentions_activities($user_id=0,$page='',$per_page=''){
 		'page'              => $page,        // which page to load
 		'per_page'          => $per_page,    // number of items per page
 		'scope'             => 'mentions',     // user_id to filter on
+		 
+	);
+
+	add_filter('ajan_has_activities','ajan_has_activities_return',10,3);
+
+    return ajan_has_activities($args) ;
+
+ }
+
+
+
+ /**
+ * get activities which the user has marked as favorite,
+ *
+ * @since ajency-activity-and-notifications (0.1.0)
+ * @uses ajan_has_activities() to get activities.
+ * @uses ajan_has_activities filter hook to return the as it is
+ * @param $user_id the user id of the user whose favorite activites have tobe returned, 
+ * if not passed the logged in users activites are returned
+ * @param $page which page /offset to return
+ * @param $per_page no of activites per page
+ * if either  $page or $per_page activites are not paginated
+ */
+
+function ajan_get_user_favorite_activities($user_id=0,$page='',$per_page=''){
+
+	//if no user_id is passed then get the current logged in user id and return his activities
+	if($user_id==0){
+
+		global $user_ID;
+
+		$user_id = $user_ID;
+
+	}
+	$args = array( 
+		// Filtering
+		'user_id'           => $user_id,     // user_id to filter on
+		'page'              => $page,        // which page to load
+		'per_page'          => $per_page,    // number of items per page
+		'scope'             => 'favorites',     // user_id to filter on
 		 
 	);
 
