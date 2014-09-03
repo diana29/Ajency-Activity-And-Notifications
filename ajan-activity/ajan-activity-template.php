@@ -149,8 +149,9 @@ class AJAN_Activity_Template {
 				7 => 'display_comments',
 				8 => 'show_hidden',
 				9 => 'exclude',
-				10 => 'in', 
-				11 => 'page_arg'
+				10 => 'in',
+				11 => 'spam',
+				12 => 'page_arg'
 			);
 
 			$func_args = func_get_args();
@@ -170,7 +171,8 @@ class AJAN_Activity_Template {
 			'search_terms'      => false,
 			'meta_query'        => false,
 			'display_comments'  => 'threaded',
-			'show_hidden'       => false, 
+			'show_hidden'       => false,
+			'spam'              => 'ham_only',
 			'update_meta_cache' => true,
 		);
 		$r = wp_parse_args( $args, $defaults );
@@ -616,18 +618,16 @@ function ajan_has_activities( $args = '' ) {
 					$user_id = 0;
 					break;
 				case 'mentions':
+
 					// Are mentions disabled?
 					if ( ! ajan_activity_do_mentions() ) {
 						return false;
 					}
 
-			 
-				echo ajan_activity_get_user_mentionname( $user_id );
 					// Start search at @ symbol and stop search at closing tag delimiter.
 					$search_terms     = '@' . ajan_activity_get_user_mentionname( $user_id ) . '<';
 					$display_comments = 'stream';
 					$user_id = 0;
-			 
 					break;
 			}
 		}
@@ -664,15 +664,14 @@ function ajan_has_activities( $args = '' ) {
 		'search_terms'      => $search_terms,
 		'meta_query'        => $meta_query,
 		'display_comments'  => $display_comments,
-		'show_hidden'       => $show_hidden, 
+		'show_hidden'       => $show_hidden,
+		'spam'              => $spam,
 		'update_meta_cache' => $update_meta_cache,
-
 	);
- 
+
 	$activities_template = new AJAN_Activity_Template( $template_args );
 
-	return ($activities_template);
-
+	return apply_filters( 'ajan_has_activities', $activities_template->has_activities(), $activities_template, $template_args );
 }
 
 /**

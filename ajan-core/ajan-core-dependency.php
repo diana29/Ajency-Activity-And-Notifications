@@ -820,3 +820,19 @@ function ajan_core_get_core_userdata( $user_id ) {
 function ajan_get_displayed_user_fullname(){
 	return "fullname";
 }
+
+
+/**
+ * Returns the user_id for a user based on their user_nicename.
+ * @param string $username Username to check.
+ * @global $wpdb WordPress DB access object.
+ * @return int|bool The ID of the matched user, or false.
+ */
+function ajan_core_get_userid_from_nicename( $user_nicename ) {
+	global $wpdb;
+
+	if ( empty( $user_nicename ) )
+		return false;
+
+	return apply_filters( 'ajan_core_get_userid_from_nicename', $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->users} WHERE user_nicename = %s", $user_nicename ) ), $user_nicename );
+}

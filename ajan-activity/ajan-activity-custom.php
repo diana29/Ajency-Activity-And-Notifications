@@ -38,4 +38,52 @@ function ajan_theme_set_activity_action() {
 }
 add_action( 'ajan_theme_set_activity_action', 'ajan_theme_set_activity_action' );
 
- 
+
+
+
+/**
+ * get user specific activities
+ *
+ * @since ajency-activity-and-notifications (0.1.0)
+ * @uses ajan_has_activities() to get activities.
+ * @uses ajan_has_activities filter hook to return the as it is
+ * @param $user_id the users whose activities need to be returned, 
+ * if not passed the logged in users activites are returned
+ * @param $page which page /offset to return
+ * @param $per_page no of activites per page
+ * if either  $page or $per_page activites are not paginated
+ */
+
+function ajan_get_user_personal_activities($user_id=0,$page='',$per_page=''){
+
+	//if no user_id is passed then get the current logged in user id and return his activities
+	if($user_id==0){
+
+		global $user_ID;
+
+		$user_id = $user_ID;
+
+	}
+	$args = array( 
+		// Filtering
+		'user_id'           => $user_id,     // user_id to filter on
+		'page'              => $page,        // which page to load
+		'per_page'          => $per_page,    // number of items per page
+		 
+	);
+
+	add_filter('ajan_has_activities','ajan_has_activities_return',10,3);
+
+    return ajan_has_activities($args) ;
+
+ }
+
+/**
+ * return the activity collections called on ajan_has_activities filter hook
+ *
+ * @since ajency-activity-and-notifications (0.1.0) 
+ */
+function ajan_has_activities_return($has_activities, $activities_template, $template_args){
+
+	return $activities_template;
+}
