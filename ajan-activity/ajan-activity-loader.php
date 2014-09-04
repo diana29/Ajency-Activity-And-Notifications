@@ -55,7 +55,8 @@ class AJAN_Activity_Component extends AJAN_Component {
 			'functions',
 			'notifications',
 			'cache',
-			'custom'
+			'custom',
+			'activities'
 		);
 
 		// Load Akismet support if Akismet is configured

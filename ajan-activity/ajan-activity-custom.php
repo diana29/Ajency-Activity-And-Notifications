@@ -9,10 +9,10 @@
  */
 function ajan_register_custom_activity_actions() {
  
-	do_action( 'ajan_theme_set_activity_action' );
+	do_action( 'ajan_set_activity_action' );
 
 }
-add_action( 'ajan_init', 'ajan_register_activity_actions', 9 );
+add_action( 'ajan_init', 'ajan_register_custom_activity_actions', 12 );
 
 
 /**
@@ -22,21 +22,26 @@ add_action( 'ajan_init', 'ajan_register_activity_actions', 9 );
  *
  * @global object $ajan BuddyPress global settings.
  */
-function ajan_theme_set_activity_action() {
+function ajan_set_activity_action() {
+	 
 	global $ajan;
 
 	$theme_activity_actions = apply_filters('ajan_register_theme_activity_actions',array());
  
-	foreach($theme_activity_actions as $theme_activity_action){
-			ajan_activity_set_action($theme_activity_action['component_id'], 
-			$theme_activity_action['type'],
-			$theme_activity_action['description'],
-			$theme_activity_action['format_callback'] 
+ 	$plugin_activity_actions = apply_filters('ajan_register_plugin_activity_actions',array());
+ 
+ 	$activity_actions = array_merge($theme_activity_actions,$plugin_activity_actions);
+
+	foreach($activity_actions as $activity_action){
+			ajan_activity_set_action($activity_action['component_id'], 
+			$activity_action['type'],
+			$activity_action['description'],
+			$activity_action['format_callback'] 
 		); 
 	}
 
 }
-add_action( 'ajan_theme_set_activity_action', 'ajan_theme_set_activity_action' );
+add_action( 'ajan_set_activity_action', 'ajan_set_activity_action' );
 
 
 /**
@@ -86,6 +91,7 @@ function ajan_get_user_personal_activities($user_id=0,$page='',$per_page=''){
 		'page'              => $page,        // which page to load
 		'per_page'          => $per_page,    // number of items per page
 		'show_hidden'		=> true,
+		'display_comments'  => true,
 		 
 	);
 

@@ -446,8 +446,9 @@ class AJAN_Activity_Activity {
 			ajan_activity_update_meta_cache( $activity_ids );
 		}
 
-		if ( $activities && $display_comments )
+		if ( $activities && $display_comments ){ 
 			$activities = AJAN_Activity_Activity::append_comments( $activities, $spam );
+		}
 
 		// Pre-fetch data associated with activity users and other objects
 		AJAN_Activity_Activity::prefetch_object_data( $activities );
@@ -891,13 +892,13 @@ class AJAN_Activity_Activity {
 	 * @param bool $spam Optional. 'ham_only' (default), 'spam_only' or 'all'.
 	 * @return array The updated activities with nested comments.
 	 */
-	public static function append_comments( $activities, $spam = 'ham_only' ) {
+	public static function append_comments( $activities  ) {
 		$activity_comments = array();
 
 		// Now fetch the activity comments and parse them into the correct position in the activities array.
 		foreach ( (array) $activities as $activity ) {
 			$top_level_parent_id = 'activity_comment' == $activity->type ? $activity->item_id : 0;
-			$activity_comments[$activity->id] = AJAN_Activity_Activity::get_activity_comments( $activity->id, $activity->mptt_left, $activity->mptt_right, $spam, $top_level_parent_id );
+			$activity_comments[$activity->id] = AJAN_Activity_Activity::get_activity_comments( $activity->id, $activity->mptt_left, $activity->mptt_right,  $top_level_parent_id );
 		}
 
 		// Merge the comments with the activity items
@@ -925,7 +926,7 @@ class AJAN_Activity_Activity {
 	 * @param int $top_level_parent_id Optional. The id of the root-level parent activity item.
 	 * @return array The updated activities with nested comments.
 	 */
-	public static function get_activity_comments( $activity_id, $left, $right, $spam = 'ham_only', $top_level_parent_id = 0 ) {
+	public static function get_activity_comments( $activity_id, $left, $right,  $top_level_parent_id = 0 ) {
 		global $wpdb, $ajan;
 
 		if ( empty( $top_level_parent_id ) ) {
@@ -953,14 +954,7 @@ class AJAN_Activity_Activity {
 				$fullname_select = $fullname_from = $fullname_where = '';
 			}
 
-			// Don't retrieve activity comments marked as spam
-			if ( 'ham_only' == $spam ) {
-				$spam_sql = 'AND a.is_spam = 0';
-			} elseif ( 'spam_only' == $spam ) {
-				$spam_sql = 'AND a.is_spam = 1';
-			} else {
-				$spam_sql = '';
-			}
+		 
 
 			// Legacy query - not recommended
 			$func_args = func_get_args();
@@ -972,8 +966,8 @@ class AJAN_Activity_Activity {
 			// We use the mptt BETWEEN clause to limit returned
 			// descendants to the correct part of the tree.
 			} else {
-				$sql = $wpdb->prepare( "SELECT id FROM {$ajan->activity->table_name} a WHERE a.type = 'activity_comment' {$spam_sql} AND a.item_id = %d and a.mptt_left > %d AND a.mptt_left < %d ORDER BY a.date_recorded ASC", $top_level_parent_id, $left, $right );
-
+				$sql = $wpdb->prepare( "SELECT id FROM {$ajan->activity->table_name} a WHERE a.type = 'activity_comment'   AND a.item_id = %d and a.mptt_left > %d AND a.mptt_left < %d ORDER BY a.date_recorded ASC", $top_level_parent_id, $left, $right );
+ 
 				$descendant_ids = $wpdb->get_col( $sql );
 				$descendants    = self::get_activity_data( $descendant_ids );
 				$descendants    = self::append_user_fullnames( $descendants );
