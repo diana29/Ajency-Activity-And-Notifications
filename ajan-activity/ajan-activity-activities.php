@@ -10,7 +10,7 @@
  */
 
   function ajan_register_plugin_activity_actions($args){
-  	 
+
     $args = array(
 		        array( 	'component_id'		=>	'user',
 				      	'type'				=>	'user_registered',
@@ -62,18 +62,18 @@ function record_new_user_registered_activity( $registered_user_id ) {
 
 		$args = array(
 		 
-		'action'            => $action,    // The activity action - e.g. "Jon Doe posted an update"
-		
-		'content'           => $content,    // Optional: The content of the activity item e.g. "BuddyPress is awesome guys!"
+						'action'            => $action,    // The activity action - e.g. "Jon Doe posted an update"
+						
+						'content'           => $content,    // Optional: The content of the activity item e.g. "BuddyPress is awesome guys!"
 
-		'component'         => 'user', // The name/ID of the component e.g. groups, profile, mycomponent
-		
-		'type'              => 'user_registered', // The activity type e.g. activity_update, profile_updated
-		 
-		'user_id'           => $action_user_id, // Optional: The user to record the activity for, can be false if this activity is not for a user.
-		
-		'item_id' 			=> $registered_user_id
-	);
+						'component'         => 'user', // The name/ID of the component e.g. groups, profile, mycomponent
+						
+						'type'              => 'user_registered', // The activity type e.g. activity_update, profile_updated
+						 
+						'user_id'           => $action_user_id, // Optional: The user to record the activity for, can be false if this activity is not for a user.
+						
+						'item_id' 			=> $registered_user_id
+				);
 
 	ajan_activity_add($args); 
 
