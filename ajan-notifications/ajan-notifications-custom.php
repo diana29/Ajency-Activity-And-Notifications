@@ -50,4 +50,26 @@ function ajan_notification_set_action($component,$callback){
 	return true;
 }
 
+
+/**
+ * get users notifications
+ *
+ * @since ajency-activity-and-notifications (0.1.0)
+ * @uses ajan_notifications_get_notifications_for_user() to user notification. 
+ * @param $user_id the users whose notifications need to be returned, 
+ * if not passed the logged in users notifications are returned  
+ */
+function  ajan_get_notifications_for_user($user_id=0){
+
+//if no user_id is passed then get the current logged in user id and return his activities
+	if($user_id==0){
+
+		global $user_ID;
+
+		$user_id = $user_ID;
+
+	}
+	return ajan_notifications_get_notifications_for_user($user_id);
+}
+
  

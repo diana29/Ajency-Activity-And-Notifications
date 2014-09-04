@@ -222,7 +222,7 @@ function ajan_notifications_get_notifications_for_user( $user_id, $format = 'str
 
 				// Return an array of content strings
 				} else {
-					$content      = call_user_func( $ajan->{$component_name}->notification_callback, $component_action_name, $component_action_items[0]->item_id, $component_action_items[0]->secondary_item_id, $action_item_count );
+					$content      = call_user_func( $ajan->{'notifications'}->notification_components[$component_name], $component_action_name, $component_action_items[0]->item_id, $component_action_items[0]->secondary_item_id, $action_item_count );
 					$renderable[] = $content;
 				}
 
