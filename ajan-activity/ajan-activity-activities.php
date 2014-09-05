@@ -17,6 +17,11 @@
 				        'description'		=>	'New User Registered',
 				        'format_callback'	=> 	'activity_format_activity_action_user_registered'
 					),
+		        array( 	'component_id'		=>	'activity',
+				      	'type'				=>	'activity_update',
+				        'description'		=>	'Posted an update',
+				        'format_callback'	=> 	'activity_format_activity_action_activity_update'
+					),
 		); 
 	return $args;
 

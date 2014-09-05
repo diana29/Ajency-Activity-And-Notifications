@@ -52,13 +52,13 @@ add_action( 'ajan_set_activity_action', 'ajan_set_activity_action' );
  */
 function ajan_has_activities_return($has_activities, $activities_template, $template_args){
  	
- 	
+ 	$activities = array();
  	if($has_activities){
  		foreach($activities_template->activities as $activities_template_activity)
  		{
  			$children = array(); 
  			
- 			$activities = custom_resturn_fields($activities_template_activity);
+ 			$activities[] = custom_resturn_fields($activities_template_activity);
  		}
  			
 		return $activities;

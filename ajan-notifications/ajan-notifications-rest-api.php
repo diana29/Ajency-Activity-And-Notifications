@@ -1,4 +1,7 @@
 <?php
+
+
+function activate_notification_rest_api(){
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' ); 
 //json rest api
 
@@ -13,9 +16,11 @@ if(is_plugin_active('json-rest-api/plugin.php')){
 	 */
 	function ajan_noticiation_api_init() {
 
+			global $user_ID; 
+			
 			global $ajan_api_notification;
 
-			$ajan_api_notification = new AJAN_API_Notification();
+			$ajan_api_notification = new AJAN_API_Notification($user_ID);
 
 			add_filter( 'json_endpoints', array( $ajan_api_notification, 'register_routes' ) );
 	}
@@ -29,6 +34,12 @@ if(is_plugin_active('json-rest-api/plugin.php')){
 	 * 
 	 */
 	class AJAN_API_Notification {
+
+		public function __construct( $user_id = false ) {
+
+				   $this->user_id = $user_id ;
+				}
+
 		public function register_routes( $routes ) {
 		$routes['/notification/create'] = array(
 			array( array( $this, 'add_notification'), WP_JSON_Server::CREATABLE | WP_JSON_Server::ACCEPT_JSON ),
@@ -50,10 +61,9 @@ if(is_plugin_active('json-rest-api/plugin.php')){
 		}
 
 		function get_logged_in_user_notifications(){
-
-				global $user_ID;
-
-				return $this->get_user_notifications($user_ID);
+ 
+  
+				return $this->get_user_notifications($this->user_id);
 
 		}
 
@@ -130,3 +140,5 @@ if(is_plugin_active('json-rest-api/plugin.php')){
 	}
 
 }
+}
+add_action( 'ajan_init', 'activate_notification_rest_api', 13 );
