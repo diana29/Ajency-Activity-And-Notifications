@@ -56,27 +56,9 @@ function ajan_has_activities_return($has_activities, $activities_template, $temp
  	if($has_activities){
  		foreach($activities_template->activities as $activities_template_activity)
  		{
- 			$children = array();
- 			if($activities_template_activity->children != false){
- 				foreach($activities_template_activity->children as $key =>$child){
- 						$children[] = $key; 
- 						//$activities_template->activities[]  =  $child ;
- 					}
- 			}
+ 			$children = array(); 
  			
- 			$activities = array(	'id'				=>$activities_template_activity->id,
-	 								'user_id'			=>$activities_template_activity->user_id,
-	 								'component'			=>$activities_template_activity->component,
-	 								'type'				=>$activities_template_activity->type,
-	 								'action'			=>$activities_template_activity->action,
-	 								'content'			=>$activities_template_activity->content,
-	 								'item_id'			=>$activities_template_activity->item_id,
-	 								'secondary_item_id'	=>$activities_template_activity->secondary_item_id,
-	 								'date_recorded'		=>$activities_template_activity->date_recorded,
-	 								'hide_sitewide'		=>$activities_template_activity->hide_sitewide,
-	 								'children'			=>$children,
-
- 							);
+ 			$activities = custom_resturn_fields($activities_template_activity);
  		}
  			
 		return $activities;
@@ -86,6 +68,34 @@ function ajan_has_activities_return($has_activities, $activities_template, $temp
 	
 }
 
+/**
+ * return only required fields of activity
+ *
+ */
+
+function custom_resturn_fields($activities_template_activity){
+	$children = array();
+	if($activities_template_activity->children!=false){
+
+		foreach($activities_template_activity->children as $activity_children){
+			$children[] = custom_resturn_fields($activity_children);
+		}
+		
+	}
+	return 	array(	'id'=>$activities_template_activity->id,
+				 	'user_id'			=>$activities_template_activity->user_id,
+				 	'component'			=>$activities_template_activity->component,
+				 	'type'				=>$activities_template_activity->type,
+				 	'action'			=>$activities_template_activity->action,
+				 	'content'			=>$activities_template_activity->content,
+				 	'item_id'			=>$activities_template_activity->item_id,
+				 	'secondary_item_id'	=>$activities_template_activity->secondary_item_id,
+				 	'date_recorded'		=>$activities_template_activity->date_recorded,
+				 	'hide_sitewide'		=>$activities_template_activity->hide_sitewide,
+				 	'children'			=>$children,
+
+			 		);
+}
 
 /**
  * get user specific activities
