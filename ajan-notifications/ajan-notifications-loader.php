@@ -50,6 +50,7 @@ class AJAN_Notifications_Component extends AJAN_Component {
 			'template',
 			'functions',
 			'cache',
+			'rest-api',
 			'custom'
 		);
 

@@ -69,7 +69,9 @@ function  ajan_get_notifications_for_user($user_id=0){
 		$user_id = $user_ID;
 
 	}
-	return ajan_notifications_get_notifications_for_user($user_id);
+ 
+
+	return ajan_notifications_get_notifications_for_user($user_id,'object');
 }
 
  

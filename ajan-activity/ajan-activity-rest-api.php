@@ -12,16 +12,16 @@ if(is_plugin_active('json-rest-api/plugin.php')){
 	 *
 	 * @uses json rest api plugin action hook wp_json_server_before_serve
 	 */
-	function ajan_api_init() {
+	function ajan_activity_api_init() {
 
-			global $ajan_api_mytype;
+			global $ajan_api_activity;
 
-			$ajan_api_mytype = new AJAN_API_MyType();
+			$ajan_api_activity = new AJAN_API_Activity();
 
-			add_filter( 'json_endpoints', array( $ajan_api_mytype, 'register_routes' ) );
+			add_filter( 'json_endpoints', array( $ajan_api_activity, 'register_routes' ) );
 	}
 
-	add_action( 'wp_json_server_before_serve', 'ajan_api_init' );
+	add_action( 'wp_json_server_before_serve', 'ajan_activity_api_init' );
 
 	/**
 	 * Extended class defining api cals for activites
@@ -29,7 +29,7 @@ if(is_plugin_active('json-rest-api/plugin.php')){
 	 * @since ajency-activity-and-notifications (0.1)
 	 * 
 	 */
-	class AJAN_API_MyType {
+	class AJAN_API_Activity {
 		public function register_routes( $routes ) {
 		$routes['/activity/create'] = array(
 			array( array( $this, 'add_activity'), WP_JSON_Server::CREATABLE | WP_JSON_Server::ACCEPT_JSON ),
