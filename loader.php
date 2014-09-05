@@ -437,6 +437,7 @@ class ActivityNotifications {
 		require( $this->plugin_dir . 'ajan-core/ajan-core-functions.php'  );
 		require( $this->plugin_dir . 'ajan-core/ajan-core-moderation.php' );
 		require( $this->plugin_dir . 'ajan-core/ajan-core-loader.php'     );
+		require( $this->plugin_dir . 'ajan-core/ajan-core-rest-api.php'     );
 
  
 	}
