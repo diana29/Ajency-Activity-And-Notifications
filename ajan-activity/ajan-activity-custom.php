@@ -110,25 +110,26 @@ function custom_resturn_fields($activities_template_activity){
  * if either  $page or $per_page activites are not paginated
  */
 
-function ajan_get_user_personal_activities($user_id=0,$page='',$per_page=''){
+function ajan_get_user_personal_activities($args){
 
-	//if no user_id is passed then get the current logged in user id and return his activities
-	if($user_id==0){
-
-		global $user_ID;
-
-		$user_id = $user_ID;
-
-	}
-	$args = array( 
-		// Filtering
-		'user_id'           => $user_id,     // user_id to filter on
-		'page'              => $page,        // which page to load
-		'per_page'          => $per_page,    // number of items per page
+	global $user_ID;
+	$defaults = array( 
+		'user_id'			=> $user_ID,     // user_id to filter on 
 		'show_hidden'		=> true,
-		'display_comments'  => true,
+		'display_comments'  => 'threaded',
+		'component'			=> false,
+		'action'			=> false,
+		'page'				=> '',
+		'per_page'			=> '',
 		 
 	);
+ 
+	$args = wp_parse_args( $args, $defaults );
+
+	//in the plugin get function the component is refered as object
+	$args['object'] = $args['component'];
+
+	unset($args['component']);
 
 	add_filter('ajan_has_activities','ajan_has_activities_return',10,3);
 
@@ -150,26 +151,28 @@ function ajan_get_user_personal_activities($user_id=0,$page='',$per_page=''){
  * if either  $page or $per_page activites are not paginated
  */
 
-function ajan_get_user_mentions_activities($user_id=0,$page='',$per_page=''){
-
-	//if no user_id is passed then get the current logged in user id and return his activities
-	if($user_id==0){
-
-		global $user_ID;
-
-		$user_id = $user_ID;
-
-	}
-	$args = array( 
-		// Filtering
-		'user_id'           => $user_id,     // user_id to filter on
-		'page'              => $page,        // which page to load
-		'per_page'          => $per_page,    // number of items per page
+function ajan_get_user_mentions_activities($args){
+	global $user_ID; 
+	$defaults = array( 
+		'user_id'			=> $user_ID,     // user_id to filter on 
 		'scope'             => 'mentions',     // user_id to filter on
 		'show_hidden'		=> true,
+		'display_comments'  => 'threaded',
+		'component'			=> false,
+		'action'			=> false,
+		'page'				=> '',
+		'per_page'			=> '',
 		 
 	);
+ 
+	$args = wp_parse_args( $args, $defaults );
 
+	//in the plugin get function the component is refered as object
+	$args['object'] = $args['component'];
+
+	unset($args['component']);
+
+	 
 	add_filter('ajan_has_activities','ajan_has_activities_return',10,3);
 
     return ajan_has_activities($args) ;
@@ -193,23 +196,21 @@ function ajan_get_user_mentions_activities($user_id=0,$page='',$per_page=''){
 
 function ajan_get_user_favorite_activities($user_id=0,$page='',$per_page=''){
 
-	//if no user_id is passed then get the current logged in user id and return his activities
-	if($user_id==0){
-
-		global $user_ID;
-
-		$user_id = $user_ID;
-
-	}
-	$args = array( 
-		// Filtering
-		'user_id'           => $user_id,     // user_id to filter on
-		'page'              => $page,        // which page to load
-		'per_page'          => $per_page,    // number of items per page
+	global $user_ID; 
+	$defaults = array( 
+		'user_id'			=> $user_ID,     // user_id to filter on 
 		'scope'             => 'favorites',     // user_id to filter on
+		'show_hidden'		=> true,
+		'display_comments'  => 'threaded',
+		'component'			=> false,
+		'action'			=> false,
+		'page'				=> '',
+		'per_page'			=> '',
 		 
 	);
-
+ 
+	$args = wp_parse_args( $args, $defaults );
+	 
 	add_filter('ajan_has_activities','ajan_has_activities_return',10,3);
 
     return ajan_has_activities($args) ;
@@ -228,17 +229,78 @@ function ajan_get_user_favorite_activities($user_id=0,$page='',$per_page=''){
  */
 
 function ajan_get_site_wide_activities($page='',$per_page=''){
-
-	 
-	$args = array( 
-		// Filtering 
-		'page'              => $page,        // which page to load
-		'per_page'          => $per_page,    // number of items per page 
+ 
+	$defaults = array(  
+		'scope'             => 'favorites',     // user_id to filter on
+		'show_hidden'		=> true,
+		'display_comments'  => 'threaded',
+		'component'			=> false,
+		'action'			=> false,
+		'page'				=> '',
+		'per_page'			=> '',
 		 
 	);
+	 
+ 
 
 	add_filter('ajan_has_activities','ajan_has_activities_return',10,3);
 
     return ajan_has_activities($args) ;
 
  }
+
+  /**
+ * get activity by activity id
+ *
+ * @since ajency-activity-and-notifications (0.1.0)
+ * @uses ajan_has_activities() to get activities.
+ * @uses ajan_has_activities filter hook to return the as it is
+ * @param $activity_id the activity id of the activity  to be returned  
+ */
+
+function ajan_get_activity_by_id($activity_id=0){
+
+	//if no user_id is passed then get the current logged in user id and return his activities
+	if($user_id==0){
+
+		global $user_ID;
+
+		$user_id = $user_ID;
+
+	}
+	$args = array( 
+		// Filtering
+		'in'           => array($activity_id) ,   // user_id to filter on 
+		'display_comments'  => 'stream', 
+		 
+	);
+
+	add_filter('ajan_has_activities','ajan_has_activities_return',10,3);
+	$activity = ajan_has_activities($args);
+ 	if($activity!=false){
+ 		return $activity[0] ;
+ 	}else{
+ 		return $activity;
+ 	}
+    
+
+ }
+
+
+ /**
+ * get all components
+ *
+ * @since ajency-activity-and-notifications (0.1.0)  
+ */
+ 
+function ajan_activity_get_components() {
+	$components  = array();
+
+	// Walk through the registered actions, and build an array of actions/values.
+
+	foreach ( activitynotifications()->activity->actions as $action_key => $action ) {
+		  
+			$components[] = $action_key;
+	}
+   return $components;
+}

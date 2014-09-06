@@ -48,6 +48,9 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 			$routes['/activity/create'] = array(
 				array( array( $this, 'add_activity'), WP_JSON_Server::CREATABLE | WP_JSON_Server::ACCEPT_JSON ),
 			);
+			$routes['/comment/create'] = array(
+				array( array( $this, 'add_comment'), WP_JSON_Server::CREATABLE | WP_JSON_Server::ACCEPT_JSON ),
+			);
 			$routes['/activities/me'] = array(
 				//returns the collection of logged in user activities
 				array( array( $this, 'get_logged_in_user_activities'), WP_JSON_Server::READABLE ),	 
@@ -63,14 +66,23 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 			return $routes;
 		}
 
-		function get_user_activities($id){
+		function get_user_activities($id,$filter){
 
-				return array(ajan_get_user_personal_activities($id));
+				$args['user_id'] = $id;
+				if(is_array($filter)){
+					foreach($filter as $filter_key => $filter_item){
+						$args[$filter_key] = $filter_item;
+					}
+				}
+				return ajan_get_user_personal_activities($args);
 		}
 
 		function get_logged_in_user_activities(){
- 
-				return $this->get_user_activities($this->user_id);
+			$filter = "";
+  				if(isset($_REQUEST['filter'])){
+  					$filter = $_REQUEST['filter'];
+  				}
+				return $this->get_user_activities($this->user_id,$filter);
 
 		}
 
@@ -116,7 +128,10 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 	 			if(count($error)==0){
 	  
 					$response = ajan_activity_add($activity); 
+					if($response !=false){
 
+						$response = ajan_get_activity_by_id($response);
+					}
 					$status = "1";
 
 	 			}else{
@@ -141,6 +156,63 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 		}
 
 
+		function add_comment(){
+	 			
+	 			global $user_ID;
+
+	 			$comment = array();
+
+	 			$error = array();
+
+	 			$status = "";
+
+	 			if(isset($_POST["user_id"])){
+	 				
+	 				$comment['user_id'] = $_POST["user_id"];
+	 			} 
+	 			if(isset($_POST["content"])){
+	 				
+	 				$comment['content'] = $_POST["content"];
+	 			}
+	 			if(isset($_POST["parent_id"])){
+	 				
+	 				$comment['parent_id'] = $_POST["parent_id"];
+	 			}
+	 			if(isset($_POST["activity_id"])){
+	 				
+	 				$comment['activity_id'] = $_POST["activity_id"];
+	 			}
+ 
+	 			if(count($error)==0){
+	  
+					$response = ajan_activity_new_comment($comment); 
+					 
+					if($response !=false){
+						$response = ajan_get_activity_by_id($response);
+					}
+					
+					$status = "1";
+
+	 			}else{
+
+	 				$response = $error;
+
+	 				$status = "0";
+
+
+	 			}
+				
+				$response = array('status'=>$status,'response' => $response);
+
+				$response = json_encode( $response );
+
+			    header( "Content-Type: application/json" );
+
+			    echo $response;
+
+			    exit;
+
+		}
 		// ...
 	}
 
