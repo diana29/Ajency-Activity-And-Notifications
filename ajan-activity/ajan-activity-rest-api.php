@@ -48,6 +48,14 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 			$routes['/activity/create'] = array(
 				array( array( $this, 'add_activity'), WP_JSON_Server::CREATABLE | WP_JSON_Server::ACCEPT_JSON ),
 			);
+			$routes['/activity/delete/(?P<id>\d+)'] = array(
+				 array( array( $this, 'delete_activity'), WP_JSON_Server::DELETABLE)
+				
+			);
+ 			$routes['/activity/update/(?P<id>\d+)'] = array(
+				 array( array( $this, 'update_activity'),      WP_JSON_Server::EDITABLE | WP_JSON_Server::ACCEPT_JSON ),
+				
+			);
 			$routes['/comment/create'] = array(
 				array( array( $this, 'add_comment'), WP_JSON_Server::CREATABLE | WP_JSON_Server::ACCEPT_JSON ),
 			);
@@ -66,23 +74,27 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 			return $routes;
 		}
 
-		function get_user_activities($id,$filter){
+		function get_user_activities($id,$component=''){
 
 				$args['user_id'] = $id;
-				if(is_array($filter)){
+				/*if(is_array($filter)){
 					foreach($filter as $filter_key => $filter_item){
 						$args[$filter_key] = $filter_item;
 					}
-				}
+				}*/
+				if(isset($_REQUEST['component'])){
+  					$component = $_REQUEST['component'];
+  				}
+				$args['component'] = $component;
 				return ajan_get_user_personal_activities($args);
 		}
 
 		function get_logged_in_user_activities(){
-			$filter = "";
-  				if(isset($_REQUEST['filter'])){
-  					$filter = $_REQUEST['filter'];
+			$component = "";
+  				if(isset($_REQUEST['component'])){
+  					$component = $_REQUEST['component'];
   				}
-				return $this->get_user_activities($this->user_id,$filter);
+				return $this->get_user_activities($this->user_id,$component);
 
 		}
 
@@ -94,7 +106,7 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
 	 			$error = array();
 
-	 			$status = "";
+	 			$status = false;  
 
 	 			if(isset($_POST["user_id"])){
 	 				
@@ -132,13 +144,13 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
 						$response = ajan_get_activity_by_id($response);
 					}
-					$status = "1";
+					$status = true;
 
 	 			}else{
 
 	 				$response = $error;
 
-	 				$status = "0";
+	 				$status = false;
 
 
 	 			}
@@ -155,7 +167,94 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
 		}
 
+		function update_activity($id){
+	 			
+	 			global $user_ID;
 
+	 			$activity = array();
+
+	 			$error = array();
+
+	 			$status = false;  
+				$id = (int) $id;
+
+				if ( empty( $id ) ) {
+					$error[] = "Invalid Activity ID";
+				} 
+	 				
+	 			$activity['id'] = $id;
+	 			 
+
+	 			if(isset($_POST["action"])){
+	 				
+	 				$activity['action'] = $_POST["action"];
+	 			}
+
+	 			if(isset($_POST["content"])){
+	 				
+	 				$activity['content'] = $_POST["content"];
+	 			}
+
+	 			if(isset($_POST["component"])){
+	 				
+	 				$activity['component'] = $_POST["component"];
+	 			}
+
+	 			if(isset($_POST["type"])){
+	 				
+	 				$activity['type'] = $_POST["type"];
+	 			}
+	  
+	  			
+				$defaults = (array)ajan_get_activity_by_id($id);
+
+
+				$activity = wp_parse_args( $activity, $defaults );
+				 
+	 			if(count($error)==0){
+ 
+					$response = ajan_activity_add($activity); 
+
+					if($response !=false){
+
+						$response = ajan_get_activity_by_id($response);
+					}
+					$status = true;
+
+	 			}else{
+
+	 				$response = $error;
+
+	 				$status = false;
+
+
+	 			}
+				
+				$response = array('status'=>$status,'response' => $response);
+
+				$response = json_encode( $response );
+
+			    header( "Content-Type: application/json" );
+
+			    echo $response;
+
+			    exit;
+
+		}
+ 
+
+		function delete_activity($id){
+ 
+			$status = ajan_activity_delete_by_id($id);
+			$response = json_encode(array('status'=>$status ));
+
+			header( "Content-Type: application/json" );
+
+			echo $response;
+
+			exit;
+
+		}
 		function add_comment(){
 	 			
 	 			global $user_ID;
@@ -164,7 +263,7 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
 	 			$error = array();
 
-	 			$status = "";
+	 			$status = false;
 
 	 			if(isset($_POST["user_id"])){
 	 				
@@ -184,20 +283,20 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 	 			}
  
 	 			if(count($error)==0){
-	  
+	 
 					$response = ajan_activity_new_comment($comment); 
 					 
 					if($response !=false){
 						$response = ajan_get_activity_by_id($response);
 					}
 					
-					$status = "1";
+					$status = true;
 
 	 			}else{
 
 	 				$response = $error;
 
-	 				$status = "0";
+	 				$status = false;
 
 
 	 			}
